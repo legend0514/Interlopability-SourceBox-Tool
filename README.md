@@ -1,1 +1,1 @@
-the file for the thing is beta v1.3 rn, dont use beta candidate. 1.3 is prob buggy so report bugs in my server https://discord.gg/geXHXMm3qE
+current version: beta v1.4. it is prob still buggy so report any bugs in my server https://discord.gg/geXHXMm3qE
