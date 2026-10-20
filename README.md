@@ -2,7 +2,9 @@
 
 [download v1.5](https://github.com/legend0514/Interlopability-SourceBox-Tool/releases/download/v1.5/sourcebox-beta-v1.5.zip)
 
-[source code](https://github.com/legend0514/Interlopability-SourceBox-Tool-v1.4-Source-Code) · [Source ZIP](https://github.com/legend0514/Interlopability-SourceBox-Tool/releases/download/v1.5/sourcebox-beta-v1.5-source.zip)
+[source code](https://github.com/legend0514/Interlopability-SourceBox-Tool-v1.4-Source-Code) · [source ZIP](https://github.com/legend0514/Interlopability-SourceBox-Tool/releases/download/v1.5/sourcebox-beta-v1.5-source.zip)
+
+[discord server](https://discord.gg/geXHXMm3qE)
 
 sourcebox beta v1.5
 
