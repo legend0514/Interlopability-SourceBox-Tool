@@ -1,29 +1,37 @@
-# SourceBox beta v1.5
+# SourceBox beta v1.5.1
 
-[download v1.5](https://github.com/legend0514/Interlopability-SourceBox-Tool/releases/download/v1.5/sourcebox-beta-v1.5.zip)
+[download v1.5.1](https://github.com/legend0514/Interlopability-SourceBox-Tool/releases/download/v1.5.1/sourcebox-beta-v1.5.1.zip)
 
-[source code](https://github.com/legend0514/Interlopability-SourceBox-Tool-v1.4-Source-Code) · [source ZIP](https://github.com/legend0514/Interlopability-SourceBox-Tool/releases/download/v1.5/sourcebox-beta-v1.5-source.zip)
+[source code](https://github.com/legend0514/Interlopability-SourceBox-Tool-v1.4-Source-Code) · [source ZIP](https://github.com/legend0514/Interlopability-SourceBox-Tool/releases/download/v1.5.1/sourcebox-beta-v1.5.1-source.zip)
 
 [discord server](https://discord.gg/geXHXMm3qE)
 
-sourcebox beta v1.5
+sourcebox beta v1.5.1
 
 bug fixes:
 
--fixed bridge detection relying on outdated connection files
+-fixed hl deathmatch source and portal 2 disconnecting during the new ragdoll tests
 
--improved recovery when another sourcebox session is using the gmod bridge
+-disabled experimental ragdolls in the public build for now, instant respawn still works
 
--fixed players disappearing during brief gaps in movement updates
+-fixed the old version number still showing on the character screen
 
--fixed unrecognized gmod weapons disconnecting the player from crossplay
+-added language selection in settings
 
--fixed e+r only responding when pressed in a specific order
+-added english, spanish, french, german and portuguese for launcher menus and common status messages
 
--stopped portal gun interactions from trying to grab the shared cube
+-made it detect your system language automatically and remember the language you pick
 
--disabled the old shared blue cube, normal shared props still work
+-kept technical logs in english so troubleshooting doesnt turn into a guessing game
 
--added messages when portal destinations arent available instead of doing nothing
+notes:
 
--updated the version shown in the launcher
+-this download still includes the shared room, the expanded maps arent bundled yet
+
+-the cs2 expanded-map lighting work isnt in this download, dont wanna claim thats fixed for everyone yet
+
+-hl deathmatch source and portal 2 passed local damage and respawn checks, other pcs still need testing
+
+-34 launcher checks and 62 coordinator tests passed, plus translation checks
+
+extract the whole zip and run Install SourceBox.cmd. close your old sourcebox session before updating.
