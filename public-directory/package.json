@@ -1,0 +1,1 @@
+{"name":"sourcebox-public-directory","private":true,"type":"module","engines":{"node":"24.x"},"scripts":{"start":"node public-directory.mjs","check":"node --check public-directory.mjs"}}
