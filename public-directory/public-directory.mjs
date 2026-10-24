@@ -1,3 +1,4 @@
+import {attachRelay} from './relay-server.mjs';
 import http from 'node:http';
 import tls from 'node:tls';
 import {randomBytes,createHash,timingSafeEqual} from 'node:crypto';
@@ -48,7 +49,7 @@ export async function probeServer(host,port,fingerprint,registrationKey){
 }
 
 // Run behind an HTTPS reverse proxy. Only trust forwarding headers from that proxy.
-export function createDirectory({ttlMs=90000,now=Date.now,probe=probeServer,allowLoopback=false,trustProxy=false,renderProxy=false}={}){
+export function createDirectory({ttlMs=90000,now=Date.now,probe=probeServer,allowLoopback=false,trustProxy=false,renderProxy=false,publicURL=null}={}){
  const listings=new Map(),rates=new Map();let checking=0;
  const prune=()=>{for(const [id,s] of listings)if(s.expires<=now())listings.delete(id);for(const [ip,r]of rates)if(r.until<=now())rates.delete(ip);};
  const server=http.createServer(async(req,res)=>{
@@ -59,7 +60,7 @@ export function createDirectory({ttlMs=90000,now=Date.now,probe=probeServer,allo
    if(rates.size>=10000&&!rates.has(ip))return reply(503,{error:'Directory is busy.'});
    const rate=rates.get(ip)??{until:now()+60000,count:0};rates.set(ip,rate);
    if(++rate.count>90)return reply(429,{error:'Please wait before refreshing again.'});
-   if(req.method==='GET'&&req.url==='/v1/servers')return reply(200,{version:1,servers:[...listings.values()].map(s=>s.listing).slice(0,100)});
+   if(req.method==='GET'&&req.url==='/v1/servers')return reply(200,{version:1,servers:[...relay.list(),...[...listings.values()].map(s=>s.listing)].slice(0,100)});
    if(req.url!=='/v1/servers'||!['POST','DELETE'].includes(req.method))return reply(404,{error:'Not found.'});
    if(!publicIPv4(ip)&&!(allowLoopback&&ip==='127.0.0.1'))return reply(400,{error:'A public IPv4 connection is required.'});
    let bytes=0,chunks=[];for await(const chunk of req){bytes+=chunk.length;if(bytes>2048){reply(413,{error:'Request is too large.'});req.destroy();return;}chunks.push(chunk);}
@@ -80,13 +81,15 @@ export function createDirectory({ttlMs=90000,now=Date.now,probe=probeServer,allo
    listings.set(id,{listing,owner,ip,expires:now()+ttlMs});reply(200,{id,host:ip,expiresIn:ttlMs});
   }catch(error){reply(error instanceof SyntaxError?400:502,{error:error instanceof SyntaxError?'Invalid JSON.':error.message});}
  });
+ const relay=attachRelay(server,{validListing,publicURL,clientIP:req=>renderProxy?renderClientIP(req.headers['x-forwarded-for']):req.socket.remoteAddress});
+ const close=server.close.bind(server);server.close=(...args)=>{relay.close();return close(...args);};
  server.requestTimeout=10000;server.headersTimeout=10000;server.maxConnections=128;
  return server;
 }
 
 if(process.argv[1]===fileURLToPath(import.meta.url)){
  const port=Number(process.env.PORT||8787),host=process.env.BIND||(process.env.RENDER==='true'?'0.0.0.0':'127.0.0.1');
- const server=createDirectory({trustProxy:process.env.TRUST_PROXY==='1',renderProxy:process.env.RENDER==='true'});
+ const server=createDirectory({trustProxy:process.env.TRUST_PROXY==='1',renderProxy:process.env.RENDER==='true',publicURL:process.env.RENDER_EXTERNAL_URL||process.env.PUBLIC_URL});
  server.listen(port,host,()=>console.log('SourceBox directory listening on '+host+':'+port));
  for(const signal of ['SIGTERM','SIGINT'])process.once(signal,()=>server.close());
 }

@@ -1,1 +1,1 @@
-{"name":"sourcebox-public-directory","private":true,"type":"module","engines":{"node":"24.x"},"scripts":{"start":"node public-directory.mjs","check":"node --check public-directory.mjs"}}
+{"name": "sourcebox-public-directory", "private": true, "type": "module", "engines": {"node": "24.x"}, "scripts": {"start": "node public-directory.mjs", "check": "node --check public-directory.mjs && node --check relay-server.mjs && node --input-type=module -e \"import('./relay-server.mjs')\""}}
