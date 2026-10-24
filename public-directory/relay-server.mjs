@@ -21,7 +21,7 @@ export function attachRelay(server,{validListing,publicURL,clientIP}) {
    ws.alive=true;ws.on('pong',()=>ws.alive=true);ws.on('error',()=>{});
    const timeout=setTimeout(()=>stop(ws),10000);ws.once('close',()=>clearTimeout(timeout));
    ws.once('message',(raw,binary)=>{
-    clearTimeout(timeout);let msg;try{if(binary||raw.length>4096)throw Error();msg=JSON.parse(raw);}catch{return stop(ws);}
+    clearTimeout(timeout);let msg;try{if(binary||raw.length>4096)throw Error();msg=JSON.parse(raw);if(!msg||typeof msg!=='object'||Array.isArray(msg))throw Error();}catch{return stop(ws);}
     if(path==='/v1/relay/host'){
      if(!validListing(msg.listing)||!/^[a-f0-9]{64}$/.test(msg.owner??'')||hosts.size>=100||[...hosts.values()].filter(h=>h.ip===ip).length>=4)return stop(ws);
      const id=createHash('sha256').update(msg.owner).digest('hex');

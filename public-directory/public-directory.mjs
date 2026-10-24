@@ -56,7 +56,7 @@ export function createDirectory({ttlMs=90000,now=Date.now,probe=probeServer,allo
   const reply=(code,data)=>{if(!res.headersSent){res.writeHead(code,{'content-type':'application/json','cache-control':'no-store'});res.end(JSON.stringify(data));}};
   try{
    prune();const ip=renderProxy?renderClientIP(req.headers['x-forwarded-for']):(trustProxy?String(req.headers['x-real-ip']??''):req.socket.remoteAddress??'').replace(/^::ffff:/,'');
-   if(req.method==='GET'&&req.url==='/health')return reply(200,{ok:true});
+   if(req.method==='GET'&&req.url==='/health')return reply(200,{ok:true,relay:1});
    if(rates.size>=10000&&!rates.has(ip))return reply(503,{error:'Directory is busy.'});
    const rate=rates.get(ip)??{until:now()+60000,count:0};rates.set(ip,rate);
    if(++rate.count>90)return reply(429,{error:'Please wait before refreshing again.'});
