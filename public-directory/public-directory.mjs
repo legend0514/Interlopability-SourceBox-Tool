@@ -30,7 +30,7 @@ export function directoryURL(value){
  return url.href.replace(/\/$/,'');
 }
 const equal=(a,b)=>typeof a==='string'&&typeof b==='string'&&a.length===b.length&&timingSafeEqual(Buffer.from(a),Buffer.from(b));
-export function validListing(s){return s&&s.protocol===VERSION&&label(s.name)&&mapId(s.map)&&Number.isInteger(s.players)&&Number.isInteger(s.maxPlayers)&&s.maxPlayers>=2&&s.maxPlayers<=32&&s.players>=0&&s.players<=s.maxPlayers&&HEX.test(s.invite?.token??'')&&HEX.test(s.invite?.fingerprint??'')&&Number.isInteger(s.invite?.port)&&s.invite.port>=1024&&s.invite.port<=65535;}
+export function validListing(s){return s&&[4,5].includes(s.protocol)&&label(s.name)&&mapId(s.map)&&Number.isInteger(s.players)&&Number.isInteger(s.maxPlayers)&&s.maxPlayers>=2&&s.maxPlayers<=32&&s.players>=0&&s.players<=s.maxPlayers&&HEX.test(s.invite?.token??'')&&HEX.test(s.invite?.fingerprint??'')&&Number.isInteger(s.invite?.port)&&s.invite.port>=1024&&s.invite.port<=65535;}
 export async function probeServer(host,port,fingerprint,registrationKey){
  return new Promise((resolve,reject)=>{
   const nonce=randomBytes(16).toString('hex');let done=false;
@@ -56,7 +56,7 @@ export function createDirectory({ttlMs=90000,now=Date.now,probe=probeServer,allo
   const reply=(code,data)=>{if(!res.headersSent){res.writeHead(code,{'content-type':'application/json','cache-control':'no-store'});res.end(JSON.stringify(data));}};
   try{
    prune();const ip=renderProxy?renderClientIP(req.headers['x-forwarded-for']):(trustProxy?String(req.headers['x-real-ip']??''):req.socket.remoteAddress??'').replace(/^::ffff:/,'');
-   if(req.method==='GET'&&req.url==='/health')return reply(200,{ok:true,relay:1});
+   if(req.method==='GET'&&req.url==='/health')return reply(200,{ok:true,relay:1,protocols:[4,5]});
    if(rates.size>=10000&&!rates.has(ip))return reply(503,{error:'Directory is busy.'});
    const rate=rates.get(ip)??{until:now()+60000,count:0};rates.set(ip,rate);
    if(++rate.count>90)return reply(429,{error:'Please wait before refreshing again.'});
@@ -77,7 +77,7 @@ export function createDirectory({ttlMs=90000,now=Date.now,probe=probeServer,allo
    if([...listings.values()].filter(s=>s.ip===ip).length>=4&&!listings.has(id))return reply(429,{error:'Too many servers on this address.'});
    checking++;let listing;try{listing=await probe(ip,data.port,data.fingerprint,data.registrationKey);}finally{checking--;}
    if(!validListing(listing)||listing.invite.fingerprint!==data.fingerprint||listing.invite.port!==data.port)throw Error('Server returned invalid listing details.');
-   listing={name:listing.name,map:listing.map,players:listing.players,maxPlayers:listing.maxPlayers,protocol:VERSION,invite:{host:ip,port:data.port,fingerprint:data.fingerprint,token:listing.invite.token}};
+   listing={name:listing.name,map:listing.map,players:listing.players,maxPlayers:listing.maxPlayers,protocol:listing.protocol,invite:{host:ip,port:data.port,fingerprint:data.fingerprint,token:listing.invite.token}};
    listings.set(id,{listing,owner,ip,expires:now()+ttlMs});reply(200,{id,host:ip,expiresIn:ttlMs});
   }catch(error){reply(error instanceof SyntaxError?400:502,{error:error instanceof SyntaxError?'Invalid JSON.':error.message});}
  });
